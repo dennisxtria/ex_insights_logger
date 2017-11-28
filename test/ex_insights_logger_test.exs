@@ -1,14 +1,22 @@
 defmodule ExInsightsLoggerTest do
   require Logger
   use ExUnit.Case
+  use Plug
   #doctest ExInsightsLogger
 
   Logger.add_backend({AriadneLogger, :test_logger})
 
-  test "tests " do
-    {ok, Pid} = :inets.start(httpd, [{port, 0},
-    {server_name,"httpd_test"}, {server_root,"/tmp"},
-    {document_root,"/tmp/htdocs"}, {bind_address, "localhost"}]).
-    {ok, "0.79.0"}
+  setup do
+    Plug.Adapters.Cowboy.child_spec(:http, MyRouter, [], [port: 4001])
+
+    post "/test" do
+      send_resp(conn, status, conn.body_params)
+    end
   end
+
+  test "tests " do
+    Logger.info("test")
+
+  end
+
 end
