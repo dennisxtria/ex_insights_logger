@@ -1,22 +1,26 @@
 defmodule ExInsightsLoggerTest do
   require Logger
   use ExUnit.Case
-  use Plug
-  #doctest ExInsightsLogger
+
+  @service_url Application.get_env(:ex_insights_logger, :service_url)
 
   Logger.add_backend({AriadneLogger, :test_logger})
 
-  setup do
-    Plug.Adapters.Cowboy.child_spec(:http, MyRouter, [], [port: 4001])
-
-    post "/test" do
-      send_resp(conn, status, conn.body_params)
-    end
+  setup_all do
+    Code.require_file("test/test_router.ex")
+    IO.inspect Code.ensure_compiled?(TestRouter) 
+    {:ok, pid} = Plug.Adapters.Cowboy.http(TestRouter, [], [port: 4001])
+    [pid: pid]
   end
 
-  test "tests " do
+  test "tests", context do
+    # Logger.metadata(sender_pid: context[:pid]) 
+    # Logger.level()
+    # |> Logger.log("fsgfds", %{pid: result})
+    #Logger.metadata([test_pid: pid])
     Logger.info("test")
-
+    #assert_receive("What I sent")
+    
   end
 
 end

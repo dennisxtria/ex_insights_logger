@@ -14,15 +14,17 @@ defmodule ExInsightsLogger.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :cowboy, :plug]
+
+      applications: [:logger, :cowboy, :plug, :httpoison, :ex_insights]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:cowboy, "~> 1.0.0", only: :test},
-      {:plug, "~> 1.0", only: :test}
+      {:cowboy, "~> 1.0.0"},
+      {:plug, "~> 1.0"},
+      {:ex_insights, path: "../ex_insights"}
     ]
   end
 end
