@@ -6,9 +6,14 @@ defmodule ExInsightsLogger do
   end
 
   def handle_event({level, _gl, {_Logger, msg, timestamp, metadata}}, state) do
-    event =  "CUSTOM LOGGER BACKEND: [#{level}, #{inspect(timestamp)}, #{msg}, #{inspect(metadata)}]"
-    IO.inspect event
-    #todo call ex_insights function to send the event!
+    event = %{timestamp: inspect(timestamp), message: msg, metadata: inspect(metadata)}
+
+    case level do
+      :info -> ExInsights.track_trace(msg, level, %{"metadata" => inspect(metadata)})
+      :debug -> ExInsights.track_event(msg, %{"metadata" => inspect(metadata)})
+      :warn -> ExInsights.track_trace(msg, level, %{"metadata" => inspect(metadata)})
+      :error -> ExInsights.track_exception(msg, :erlang.get_stacktrace, nil, %{"metadata" => inspect(metadata)})
+    end  
     {:ok, state}
   end
 end

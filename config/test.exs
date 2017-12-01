@@ -1,4 +1,5 @@
 use Mix.Config
 
-config :test,
-  service_url: "http://localhost:4001"
+config :ex_insights,
+  instrumentation_key: "0000-1111-2222-3333",
+  flush_interval_secs: 1
