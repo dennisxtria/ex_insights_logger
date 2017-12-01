@@ -1,22 +1,27 @@
 defmodule ExInsightsLoggerTest do
   require Logger
+  require ExInsights.TestHelper
+  
   use ExUnit.Case
-  use Plug
-  #doctest ExInsightsLogger
+  
+  alias ExInsights.TestHelper
 
-  Logger.add_backend({AriadneLogger, :test_logger})
+  Logger.add_backend({ExInsightsLogger, :test_logger})
 
-  setup do
-    Plug.Adapters.Cowboy.child_spec(:http, MyRouter, [], [port: 4001])
-
-    post "/test" do
-      send_resp(conn, status, conn.body_params)
-    end
+  setup_all do
+    Application.put_env(:ex_insights, :instrumentation_key, TestHelper.get_test_key)
   end
 
-  test "tests " do
-    Logger.info("test")
+  TestHelper.setup_test_client
 
+  test "tests", _context do
+    message = "This is a test"
+    Logger.info(message)
+    ExInsights.Aggregation.Worker.flush()
+    receive do
+      {:items_sent, [%{data: %{baseData: %{message: message2}}}]} -> assert message2[:message] == message
+     end
+    # IO.inspect message2, label: "Poutses"
+    # assert message == %{message: "This is a test", timestamp: ""}
   end
-
 end
