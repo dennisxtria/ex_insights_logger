@@ -9,7 +9,6 @@ defmodule LittleApp do
     Logger.log :error, "Test error"
     Logger.log :info, "Test info"
     Logger.log :warn, "Test warn"
-    Logger.log :debug, "Test debug"
   end
 
   def log_warn do
@@ -25,9 +24,16 @@ defmodule LittleApp do
   end
 
   def log_in_out do
-    Logger.debug("Functionality started!")
+    Logger.debug("Functionality started!", [value: 15])
     :timer.sleep(5000)
-    Logger.debug("Functionality ended!")
+    Logger.debug("Functionality ended!", [value: 100])
+  end
+
+  def log_functionality do
+    #todo track dependancy
+    Logger.debug("Functionality started!", [value: 15])
+    :timer.sleep(5000)
+    Logger.debug("Functionality ended!", [value: 100])
   end
   
 end

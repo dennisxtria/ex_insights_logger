@@ -6,22 +6,47 @@ defmodule ExInsightsLoggerTest do
   
   alias ExInsights.TestHelper
 
-  Logger.add_backend({ExInsightsLogger, :test_logger})
-
   setup_all do
     Application.put_env(:ex_insights, :instrumentation_key, TestHelper.get_test_key)
   end
 
   TestHelper.setup_test_client
 
-  test "tests", _context do
-    message = "This is a test"
+  test "test info" do
+    message = "info"
     Logger.info(message)
     ExInsights.Aggregation.Worker.flush()
     receive do
-      {:items_sent, [%{data: %{baseData: %{message: message2}}}]} -> assert message2[:message] == message
-     end
-    # IO.inspect message2, label: "Poutses"
-    # assert message == %{message: "This is a test", timestamp: ""}
+      {:items_sent, [%{data: %{baseData: %{message: message2}}}]} -> assert message2 == message
+    end
   end
+
+  test "test debug" do
+    message = "Test debug"
+    value = 11
+    Logger.debug(message, [value: value])
+    ExInsights.Aggregation.Worker.flush()
+    receive do
+      {:items_sent, [%{data: %{baseData: %{metrics: [metrics]}}}]} -> assert (metrics[:name] == message && metrics[:value] == value)
+     end
+  end
+
+  test "test warn" do
+    message = "warn"
+    Logger.warn(message)
+    ExInsights.Aggregation.Worker.flush()
+    receive do
+      {:items_sent, [%{data: %{baseData: %{message: message2}}}]} -> assert message2 == message
+    end
+  end
+
+  test "test error" do
+    message = "test error message"
+    Logger.error(message)
+    ExInsights.Aggregation.Worker.flush()
+    receive do
+      {:items_sent, [%{data: %{baseData: %{exceptions: [exceptions]}}}]} -> assert exceptions[:message] == message
+    end
+  end
+
 end
