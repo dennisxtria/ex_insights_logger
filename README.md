@@ -55,8 +55,14 @@ In order to add metadata, you can follow the example below:
 Logger.log_info("<your message>", [custom: metadata])
 ```
 
+![additional meta](/screenshots/additionalMeta.PNG?raw=true)
+
 In order to include an Erlang `stacktrace`, the `handle_at` variable and a `measurements` map,  you can follow the example below:
 
 ```elixir
 Logger.log_error("<your message>", [stack_trace: :erlang.get_stacktrace, handle_at: "your_handle_at", measurements: %{"test" => 11}])
 ```
+
+![additional meta](/screenshots/metaError.PNG?raw=true)
+
+![additional meta](/screenshots/errorLog.PNG?raw=true)
