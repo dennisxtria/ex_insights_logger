@@ -1,19 +1,40 @@
 defmodule ExInsightsLogger do
+  @moduledoc """
+  This is a Logger module, using ExInsights to receive different kinds of logs
+  and output them with the proper track method to Azure.
+
+  This module has the following functions: `init/1`, `handle_event/2`.
+  """
   use GenEvent
 
-  def init(name) do
-    {:ok, %{name: name, config: []}}
-  end
+  @doc """
+  Initializes the GenEvent for the Logger.
+  """
+  def init(name), do: {:ok, %{name: name, config: []}}
 
-  def handle_event({level, _gl, {_Logger, msg, timestamp, metadata}}, state) do
-    event = %{timestamp: inspect(timestamp), message: msg, metadata: inspect(metadata)}
-    #IO.inspect metadata[:value]
-    
-    case level do
-      lvl when lvl in [:info, :warn] -> ExInsights.track_trace(msg, level, %{"metadata" => inspect(metadata)})
-      :debug -> ExInsights.track_metric(msg, metadata[:value], %{"metadata" => inspect(metadata)})
-      :error -> ExInsights.track_exception(msg, :erlang.get_stacktrace, nil, %{"metadata" => inspect(metadata)})
-    end  
+  @doc """
+  Waits for a log event to be triggered and sends the data to the track method accordingly.
+  """
+  def handle_event({level, _gl, {_Logger, msg, _timestamp, metadata}}, state) do
+    track(level, msg, metadata)
     {:ok, state}
   end
+
+  defp track(level, msg, metadata) when level in [:info, :warn],
+    do: ExInsights.track_trace(msg, level, fix(metadata))
+  defp track(:debug, msg, metadata),
+    do: ExInsights.track_metric(msg, metadata[:value], fix(metadata))
+  defp track(:error, msg, metadata),
+    do: ExInsights.track_exception(msg, metadata[:stack_trace] || [], metadata[:handle_at] || nil, fix(metadata), metadata[:measurements] || %{})
+
+  defp fix(metadata) do
+    metadata
+    |> Enum.map(fn {key, value} -> {to_string(key), formatter(value)} end)
+    |> Enum.into(%{})
+  end
+
+  defp formatter(value) when is_binary(value), do: value
+  defp formatter(value) when is_atom(value), do: Atom.to_string(value)
+  defp formatter(value), do: inspect(value)
+
 end

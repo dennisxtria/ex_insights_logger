@@ -9,30 +9,32 @@ defmodule ExInsightsLogger.Mixfile do
       start_permanent: Mix.env == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env),
+
+      #Docs
+      name: "ExInsightsLogger",
+      source_url: "https://github.com/dennisxtria/ex_insights_logger",
     ]
   end
-  
+
   def elixirc_paths(:test) do
     ["lib", "deps/ex_insights/test/test_helper"]
   end
 
   def elixirc_paths(_) do
-    ["lib"] 
+    ["lib"]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
-
       applications: [:logger, :ex_insights]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      #{:ex_insights, git: "https://github.com/StoiximanServices/ex_insights.git"}
-      {:ex_insights, git: "https://github.com/k11sths/ex_insights.git", branch: "test-helper"}
+      {:ex_insights, "~> 0.4"},
+      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
     ]
   end
 end
