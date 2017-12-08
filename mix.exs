@@ -8,20 +8,12 @@ defmodule ExInsightsLogger.Mixfile do
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env),
-
-      #Docs
       name: "ExInsightsLogger",
+      description: description,
       source_url: "https://github.com/dennisxtria/ex_insights_logger",
+      elixirc_paths: elixirc_paths(Mix.env),
+      # package: package,
     ]
-  end
-
-  def elixirc_paths(:test) do
-    ["lib", "deps/ex_insights/test/test_helper"]
-  end
-
-  def elixirc_paths(_) do
-    ["lib"]
   end
 
   def application do
@@ -32,9 +24,33 @@ defmodule ExInsightsLogger.Mixfile do
 
   defp deps do
     [
-      {:ex_insights, "~> 0.4"},
+      {:ex_insights, "~> 0.3"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
     ]
   end
+
+  defp description do
+    """
+    Elixir custom Logger that automatically uploads your application logs on Azure Application Insights.
+    """
+  end
+
+  # defp package do
+  #   [
+  #     maintainers: ["bottlenecked"],
+  #     licenses: ["MIT"],
+  #     links: %{"GitHub" => "https://github.com/dennisxtria/ex_insights_logger"}
+  #   ]
+  # end
+
+  def elixirc_paths(:test) do
+    ["lib", "deps/ex_insights/test/test_helper"]
+  end
+
+  def elixirc_paths(_) do
+    ["lib"]
+  end
+
+
 end
