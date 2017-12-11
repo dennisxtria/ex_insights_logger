@@ -27,6 +27,16 @@ config :logger,
   backends: [ExInsightsLogger],
 ```
 
+You can choose specific fields to be in the metadata, by explicitly including them in the `config.exs`:
+
+```elixir
+config :logger,
+  backends: [ExInsightsLogger],
+  metadata: [:function, :pid, :stack_trace],
+```
+
+![additional meta](/screenshots/custom_meta_filter.PNG?raw=true)
+
 For more information configuring the backends, visit [`Logger Backends`](https://hexdocs.pm/logger/Logger.html#module-backends).
 
 ## Usage
@@ -43,7 +53,7 @@ Logger.log_warn("<your message>")
 # will raise an error message
 Logger.log_error("<your message>")
 
-# will produce a message for debug purposes
+# will produce a message for debugging purposes
 Logger.debug("<your message>")
 ```
 
@@ -55,7 +65,7 @@ In order to add metadata, you can follow the example below:
 Logger.log_info("<your message>", [custom: metadata])
 ```
 
-![additional meta](/screenshots/additionalMeta.PNG?raw=true)
+![additional meta](/screenshots/additional_meta.PNG?raw=true)
 
 In order to include an Erlang `stacktrace`, the `handle_at` variable and a `measurements` map,  you can follow the example below:
 
@@ -63,6 +73,6 @@ In order to include an Erlang `stacktrace`, the `handle_at` variable and a `meas
 Logger.log_error("<your message>", [stack_trace: :erlang.get_stacktrace, handle_at: "your_handle_at", measurements: %{"test" => 11}])
 ```
 
-![additional meta](/screenshots/metaError.PNG?raw=true)
+![additional meta](/screenshots/additional_error.PNG?raw=true)
 
-![additional meta](/screenshots/errorLog.PNG?raw=true)
+![additional meta](/screenshots/stacktrace.PNG?raw=true)
