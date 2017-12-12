@@ -59,7 +59,12 @@ defmodule ExInsightsLogger do
     do
       ExInsights.track_trace(message, :error, fix(metadata))
     else
-      _ -> ExInsights.track_exception(message, stacktrace_to_string(metadata[:stack_trace]), metadata[:handle_at] || nil, fix(metadata), metadata[:measurements] || %{})
+      _ ->
+      stacktrace = stacktrace_to_string(metadata[:stack_trace])
+      metadata = fix(metadata)
+      measurements = metadata[:measurements]
+      handle_at = metadata[:handle_at]
+      ExInsights.track_exception(message, stacktrace, handle_at || nil, metadata, measurements || %{})
     end
   end
   defp track(metadata, severity_level, message) do
@@ -69,15 +74,24 @@ defmodule ExInsightsLogger do
   #converts the file value of the stacktrace from charlist to string
   @spec stacktrace_to_string(stack_trace :: stack_trace) :: keyword
   defp stacktrace_to_string(stacktrace) do
-    Enum.map(stacktrace, fn {module, function, arity, [file: file, line: line]} -> {module, function, arity, [file: to_string(file), line: line]} end)
+    Enum.map(stacktrace, fn {module, function, arity, [file: file, line: line]} ->
+      {module, function, arity, [file: to_string(file), line: line]} end)
   end
 
   #filters metadata to return only the fields which are in the config
   @spec filter_metadata(metadata :: metadata) :: keyword
   defp filter_metadata(metadata) do
-    Application.get_env(:logger, :metadata)
-    |> Enum.map(fn x -> {x, metadata[x]} end)
-    |> Enum.filter(fn {_, b} -> b != nil end)
+    with \
+      nil <- Application.get_env(:logger, :metadata)
+    do
+      metadata
+    else
+      _ ->
+        :logger
+        |> Application.get_env(:metadata)
+        |> Enum.map(fn x -> {x, metadata[x]} end)
+        |> Enum.filter(fn {_, b} -> b != nil end)
+    end
   end
 
   #converts metadata key-value pairs to string and then, into a map

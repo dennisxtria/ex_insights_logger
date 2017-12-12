@@ -33,6 +33,7 @@ defmodule ExInsightsLogger.Mixfile do
   defp deps do
     [
       {:ex_insights, "~> 0.3.1"},
+      #{:ex_insights, git: "https://github.com/dennisxtria/ex_insights.git", branch: "test-helper-moved"},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
