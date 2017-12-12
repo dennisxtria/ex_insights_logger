@@ -9,11 +9,19 @@ defmodule ExInsightsLogger.Mixfile do
       start_permanent: Mix.env == :prod,
       deps: deps(),
       name: "ExInsightsLogger",
-      description: description,
+      description: description(),
       source_url: "https://github.com/dennisxtria/ex_insights_logger",
       elixirc_paths: elixirc_paths(Mix.env),
       # package: package,
     ]
+  end
+
+  def elixirc_paths(:test) do
+    ["lib", "deps/ex_insights/test/test_helper"]
+  end
+
+  def elixirc_paths(_) do
+    ["lib"]
   end
 
   def application do
@@ -24,9 +32,10 @@ defmodule ExInsightsLogger.Mixfile do
 
   defp deps do
     [
-      {:ex_insights, "~> 0.3"},
+      {:ex_insights, "~> 0.3.1"},
+      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
     ]
   end
 
@@ -44,13 +53,6 @@ defmodule ExInsightsLogger.Mixfile do
   #   ]
   # end
 
-  def elixirc_paths(:test) do
-    ["lib", "deps/ex_insights/test/test_helper"]
-  end
-
-  def elixirc_paths(_) do
-    ["lib"]
-  end
 
 
 end
